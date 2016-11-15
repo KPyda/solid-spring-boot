@@ -3,6 +3,8 @@ package pl.pyda.service.calculation;
 import pl.pyda.model.Order;
 import pl.pyda.model.OrderItem;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ public class PolandCalculationStrategy implements CalculationStrategy {
 		for (Double price : prices) {
 			finalPrice += price;
 		}
-		return finalPrice;
+		return BigDecimal.valueOf(finalPrice)
+				.setScale(2, RoundingMode.HALF_UP)
+				.doubleValue();
 	}
 }

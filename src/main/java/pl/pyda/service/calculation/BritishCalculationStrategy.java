@@ -3,6 +3,8 @@ package pl.pyda.service.calculation;
 import pl.pyda.model.Order;
 import pl.pyda.model.OrderItem;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,7 +18,7 @@ public class BritishCalculationStrategy implements CalculationStrategy {
 		Set<OrderItem> orderItems = order.getOrderItems();
 		List<Double> prices = orderItems.stream()
 				.map(OrderItem::calculatePrice)
-				.map(price -> order.getCurrency().getExchangeRate() * price)
+				.map(price -> price / order.getCurrency().getExchangeRate())
 				.map(price -> price * 1.40)
 				.collect(Collectors.toList());
 		return order.setPrice(calculateFinalPrice(prices));
@@ -27,6 +29,8 @@ public class BritishCalculationStrategy implements CalculationStrategy {
 		for (Double price : prices) {
 			finalPrice += price;
 		}
-		return finalPrice;
+		return BigDecimal.valueOf(finalPrice)
+				.setScale(2, RoundingMode.HALF_UP)
+				.doubleValue();
 	}
 }
